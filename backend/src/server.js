@@ -20,6 +20,9 @@ app.use(cookieParser())
  
 const __dirname = path.resolve();
 
+app.use("/api/auth", authRoutes);
+app.use("/api/message", messageRoutes);
+
 if(ENV.NODE_ENV === "production"){
     app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
@@ -31,9 +34,6 @@ if(ENV.NODE_ENV === "production"){
         res.send("API is running...");
     })
 }
-
-app.use("/api/auth", authRoutes);
-app.use("/api/message", messageRoutes);
 
 // Connect to database first, then start server
 connectDb().then(() => {
