@@ -30,7 +30,7 @@ if(ENV.NODE_ENV === "production"){
 }
 
 app.use("/api/auth", authRoutes);
-app.use("/api/messages", messageRoutes);
+app.use("/api/message", messageRoutes);
 
 app.listen(PORT, () => {
   console.log("Server is running on port "+ PORT);

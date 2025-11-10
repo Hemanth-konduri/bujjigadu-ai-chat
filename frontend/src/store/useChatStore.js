@@ -11,13 +11,14 @@ export const useChatStore = create((set,get)=>({
     selectedUser: null,
     isUserLoading: false,
     isMessagesLoading: false,
-    isSoundEnabled: localStorage.getItem("isSoundEnabled") === "true",
+    isSoundEnabled: JSON.parse(localStorage.getItem("isSoundEnabled")) !== "false",
     toggleSound: ()=>{
-        localStorage.setItem("isSoundEnabled", !get().isSoundEnabled);
-        set({isSoundEnabled: !get().isSoundEnabled});
+        const newSoundState = !get().isSoundEnabled;
+        localStorage.setItem("isSoundEnabled", newSoundState.toString());
+        set({isSoundEnabled: newSoundState});
     },
 
-    setActivetab: (tab)=>{
+    setActiveTab: (tab)=>{
         set({activeTab: tab});
     },
 
@@ -29,10 +30,13 @@ export const useChatStore = create((set,get)=>({
         set({isUserLoading:true});
         try {
             const res = await axiosInstance.get("/message/contacts");
+            console.log('All contacts response:', res.data);
             set({allContacts: res.data});
 
         } catch (error) {
-            toast.error(error.response.data.error || "Something went wrong while fetching contacts");
+            console.log('Error fetching contacts:', error);
+            console.log('Error response:', error.response?.data);
+            toast.error(error.response?.data?.error || "Something went wrong while fetching contacts");
             
         }finally{
             set({isUserLoading:false});
@@ -43,10 +47,13 @@ export const useChatStore = create((set,get)=>({
         set({isUserLoading:true});
         try {
             const res = await axiosInstance.get("/message/chats");
+            console.log('Chat partners response:', res.data);
             set({chats: res.data});
 
         } catch (error) {
-            toast.error(error.response.data.error || "Something went wrong while fetching chat partners");
+            console.log('Error fetching chat partners:', error);
+            console.log('Error response:', error.response?.data);
+            toast.error(error.response?.data?.error || "Something went wrong while fetching chat partners");
 
         }finally{
             set({isUserLoading:false});
