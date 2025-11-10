@@ -1,83 +1,96 @@
-import { LucideClockAlert } from "lucide-react";
-import toast from "react-hot-toast";
-import {create} from "zustand";
+import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
+import toast from "react-hot-toast";
+import { useAuthStore } from "./useAuthStore";
 
-export const useChatStore = create((set,get)=>({
-    allContacts: [],
-    chats: [],
-    messages: [],
-    activeTab: "chats",
-    selectedUser: null,
-    isUserLoading: false,
-    isMessagesLoading: false,
-    isSoundEnabled: JSON.parse(localStorage.getItem("isSoundEnabled")) !== "false",
-    toggleSound: ()=>{
-        const newSoundState = !get().isSoundEnabled;
-        localStorage.setItem("isSoundEnabled", newSoundState.toString());
-        set({isSoundEnabled: newSoundState});
-    },
+export const useChatStore = create((set, get) => ({
+  allContacts: [],
+  chats: [],
+  messages: [],
+  activeTab: "chats",
+  selectedUser: null,
+  isUserLoading: false,
+  isMessagesLoading: false,
+  isSoundEnabled: JSON.parse(localStorage.getItem("isSoundEnabled")) === true,
 
-    setActiveTab: (tab)=>{
-        set({activeTab: tab});
-    },
+  toggleSound: () => {
+    localStorage.setItem("isSoundEnabled", !get().isSoundEnabled);
+    set({ isSoundEnabled: !get().isSoundEnabled });
+  },
 
-    setSelectedUser: (selectedUser)=>{
-        set({selectedUser});
-    },
+  setActiveTab: (tab) => set({ activeTab: tab }),
+  setSelectedUser: (selectedUser) => set({ selectedUser }),
 
-    getAllContacts: async()=>{
-        set({isUserLoading:true});
-        try {
-            const res = await axiosInstance.get("/message/contacts");
-            console.log('All contacts response:', res.data);
-            set({allContacts: res.data});
+  getAllContacts: async () => {
+    set({ isUserLoading: true });
+    try {
+      const res = await axiosInstance.get("/message/contacts");
+      set({ allContacts: res.data });
+    } catch (error) {
+      toast.error(error.response?.data?.error || "Failed to fetch contacts");
+    } finally {
+      set({ isUserLoading: false });
+    }
+  },
+  getMyChatPartners: async () => {
+    set({ isUserLoading: true });
+    try {
+      const res = await axiosInstance.get("/message/chats");
+      set({ chats: res.data });
+    } catch (error) {
+      toast.error(error.response?.data?.error || "Failed to fetch chats");
+    } finally {
+      set({ isUserLoading: false });
+    }
+  },
 
-        } catch (error) {
-            console.log('Error fetching contacts:', error);
-            console.log('Error response:', error.response?.data);
-            toast.error(error.response?.data?.error || "Something went wrong while fetching contacts");
-            
-        }finally{
-            set({isUserLoading:false});
-        }
-    },
+  getMessagesByUserId: async (userId) => {
+    set({ isMessagesLoading: true });
+    try {
+      const res = await axiosInstance.get(`/message/${userId}`);
+      set({ messages: res.data });
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong");
+    } finally {
+      set({ isMessagesLoading: false });
+    }
+  },
 
-    getMyChatPartners: async()=>{
-        set({isUserLoading:true});
-        try {
-            const res = await axiosInstance.get("/message/chats");
-            console.log('Chat partners response:', res.data);
-            set({chats: res.data});
+  sendMessage: async (userId, messageData) => {
+    const { messages } = get();
+    try {
+      const res = await axiosInstance.post(`/message/send/${userId}`, messageData);
+      set({ messages: [...messages, res.data] });
+    } catch (error) {
+      toast.error(error.response?.data?.error || "Failed to send message");
+      throw error;
+    }
+  },
 
-        } catch (error) {
-            console.log('Error fetching chat partners:', error);
-            console.log('Error response:', error.response?.data);
-            toast.error(error.response?.data?.error || "Something went wrong while fetching chat partners");
+//   subscribeToMessages: () => {
+//     const { selectedUser, isSoundEnabled } = get();
+//     if (!selectedUser) return;
 
-        }finally{
-            set({isUserLoading:false});
-        }
-    },
+//     const socket = useAuthStore.getState().socket;
 
-    getMessagesByUserId: async(userId)=>{
-        set({isMessagesLoading:true});
-        try {
-            const res = await axiosInstance.get(`/message/${userId}`);
-            console.log('Messages response:', res.data);
-            set({messages: res.data});
+//     socket.on("newMessage", (newMessage) => {
+//       const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id;
+//       if (!isMessageSentFromSelectedUser) return;
 
-        } catch (error) {
-            console.log('Error fetching messages:', error);
-            console.log('Error response:', error.response?.data);
-            toast.error(error.response?.data?.error || "Something went wrong while fetching messages");
+//       const currentMessages = get().messages;
+//       set({ messages: [...currentMessages, newMessage] });
 
-        }finally{
-            set({isMessagesLoading:false});
-        }
-    },
+//       if (isSoundEnabled) {
+//         const notificationSound = new Audio("/sounds/notification.mp3");
 
-   
+//         notificationSound.currentTime = 0; // reset to start
+//         notificationSound.play().catch((e) => console.log("Audio play failed:", e));
+//       }
+//     });
+//   },
 
-
-}))
+//   unsubscribeFromMessages: () => {
+//     const socket = useAuthStore.getState().socket;
+//     socket.off("newMessage");
+//   },
+}));
