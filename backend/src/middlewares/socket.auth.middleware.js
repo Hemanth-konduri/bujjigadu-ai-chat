@@ -5,7 +5,7 @@ import User from '../models/User.js';
 export const socketAuthMiddleware = async (socket, next) => {
     try {
 //extract tokens from http only cookies
-        const cookies = socket.handshake.headers.cookie
+        const token = socket.handshake.headers.cookie
         ?.split('; ')
         .find((row)=>row.startsWith('jwt='))
         ?.split('=')[1];
