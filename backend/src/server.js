@@ -9,6 +9,9 @@ import cors from "cors";
 
 const app = express();
 
+console.log('Starting server...');
+console.log('NODE_ENV:', ENV.NODE_ENV);
+console.log('PORT:', ENV.PORT);
 
 const PORT = ENV.PORT || 3000;
 app.use(express.json());  // req.body
@@ -30,9 +33,14 @@ if(ENV.NODE_ENV === "production"){
 }
 
 app.use("/api/auth", authRoutes);
-app.use("/api/messages", messageRoutes);
+app.use("/api/message", messageRoutes);
 
-app.listen(PORT, () => {
-  console.log("Server is running on port "+ PORT);
-  connectDb();
+// Connect to database first, then start server
+connectDb().then(() => {
+  app.listen(PORT, () => {
+    console.log("Server is running on port "+ PORT);
+  });
+}).catch((error) => {
+  console.error("Failed to connect to database:", error);
+  process.exit(1);
 });
