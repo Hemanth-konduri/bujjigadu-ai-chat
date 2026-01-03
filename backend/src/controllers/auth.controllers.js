@@ -118,3 +118,13 @@ export const updateProfile = async (req, res) =>{
     
   }
 }
+
+export const googleCallback = async (req, res) => {
+  try {
+    generateToken(req.user._id, res);
+    res.redirect(`${ENV.CLIENT_URL}/chat`);
+  } catch (error) {
+    console.log("Error in Google callback:", error.message);
+    res.redirect(`${ENV.CLIENT_URL}/login?error=auth_failed`);
+  }
+}
