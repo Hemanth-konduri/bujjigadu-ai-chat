@@ -11,12 +11,23 @@ const userSchema = new mongoose.Schema({
     },
      password:{
         type:String,
-        required:true,
+        required: function() {
+            return !this.googleId;
+        },
         minlength:6
     },
     profilePic:{
         type:String,
         default:""
+    },
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
+    isEmailVerified: {
+        type: Boolean,
+        default: false
     }
 }, {timestamps: true});
 

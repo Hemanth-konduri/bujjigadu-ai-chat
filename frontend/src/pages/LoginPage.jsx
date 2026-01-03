@@ -3,6 +3,7 @@ import { useAuthStore } from '../store/useAuthStore';
 import { MessageCircleIcon, LockIcon, MailIcon, LoaderIcon } from "lucide-react";
 import { Link } from 'react-router-dom';
 import BorderAnimatedContainer from '../components/BorderAnimatedContainer';
+import GoogleOAuthButton from '../components/GoogleOAuthButton';
 
 function LoginPage() {
     const [formData, setFormData] = useState({email:"", password:""});
@@ -14,12 +15,12 @@ function LoginPage() {
     }
     
   return (
-    <div className='w-full flex items-center justify-center p-4 bg-slate-900'>
-        <div className='relative w-full max-w-4xl md:h-[600px] h-[500px]' >
+    <div className='w-full flex items-center justify-center p-4 bg-slate-900 min-h-screen'>
+        <div className='relative w-full max-w-4xl' >
           <BorderAnimatedContainer>
             <div className='w-full flex flex-col md:flex-row' >
               {/* LEFT SIDE OF FORM COLUMN */}
-              <div className='md:w-1/2 w-full h-full flex flex-col items-center justify-center p-6 bg-slate-800/60 backdrop-blur-sm' >
+              <div className='md:w-1/2 w-full flex flex-col items-center justify-center p-6 bg-slate-800/60 backdrop-blur-sm' >
               <div className='w-full max-w-md' >
                 {/* HEADING MESSAGE */}
                 <div className='text-center mb-4'>
@@ -50,6 +51,14 @@ function LoginPage() {
                       {isLoggedIn ? <LoaderIcon className='w-full h-5 mx-auto animate-spin text-center justify-center' /> : "Login"}
                     </button>
                   </div>
+
+                  <div className='flex items-center my-4'>
+                    <div className='flex-1 h-px bg-slate-600'></div>
+                    <span className='px-3 text-slate-400 text-sm'>or</span>
+                    <div className='flex-1 h-px bg-slate-600'></div>
+                  </div>
+
+                  <GoogleOAuthButton text="Continue with Google" />
 
 
                 </form>
