@@ -4,7 +4,7 @@ import { useChatStore } from "../store/useChatStore";
 import { Phone, Video, MoreVertical, ArrowLeft } from "lucide-react";
 import NoChatHistoryPlaceholder from "./NoChatHistoryPlaceholder";
 import EnhancedMessageInput from "./EnhancedMessageInput";
-import MessagesLoadingSkeleton from "./MessagesLoadingSleleton";
+import MessagesLoadingSkeleton from "./MessagesLoadingSkeleton";
 
 function ChatContainer() {
   const {
