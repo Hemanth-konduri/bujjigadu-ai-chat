@@ -1,39 +1,38 @@
-import React from 'react'
-
+import React, { useEffect } from 'react'
 import { useChatStore } from '../store/useChatStore'
-import BorderAnimatedContainer from '../components/BorderAnimatedContainer';
-import ProfileHeader from '../components/ProfileHeader';
-import ActiveTabSwitch from '../components/ActiveTabSwitch';
-import ChatsList from '../components/ChatsList';
-import ContactList from '../components/ContactList';
+import { useAuthStore } from '../store/useAuthStore'
+import ChatSidebar from '../components/ChatSidebar';
 import ChatContainer from '../components/ChatContainer';
-import NoConversationPlaceholder from '../components/NoConversationPlaceholder';
-
+import WelcomeScreen from '../components/WelcomeScreen';
+import LoadingSkeleton from '../components/LoadingSkeleton';
 
 function ChatPage() {
-  const {activeTab, selectedUser} = useChatStore();
+  const { selectedUser, isUserLoading } = useChatStore();
+  const { authUser, isCheckingAuth } = useAuthStore();
+
+  if (isCheckingAuth) {
+    return <LoadingSkeleton />;
+  }
+
+  if (!authUser) {
+    return <div>Please login to continue</div>;
+  }
 
   return (
-    <div className='relative w-full max-w-6xl h-[800px]'>
-      <BorderAnimatedContainer>
-        {/* LEFT SIDE OF THE CHAT INTERFACE */}
-        <div className='w-80 bg-slate-800/50 backdrop-blur-sm flex flex-col'>
-        <ProfileHeader/>
-        <ActiveTabSwitch/>
-        <div className='flex-1 overflow-y-auto p-4 space-y-2'>
-          {activeTab === "chats" ? <ChatsList/>: <ContactList/>}
-
-        </div>
-
-        </div>
-
-        {/* RIGHT SIDE OF THE CHAT INTERFACE */}
-        <div className='flex-1 flex flex-col bg-slate-900/50 backdrop-blur-sm'>
-        {selectedUser ? <ChatContainer/>: <NoConversationPlaceholder/>}
-
-        </div>
-      </BorderAnimatedContainer>
+    <div className='h-screen bg-slate-900 flex'>
+      {/* LEFT SIDEBAR */}
+      <div className='w-80 border-r border-slate-700 bg-slate-800'>
+        <ChatSidebar />
+      </div>
       
+      {/* RIGHT CHAT AREA */}
+      <div className='flex-1 flex flex-col bg-slate-900'>
+        {selectedUser ? (
+          <ChatContainer />
+        ) : (
+          <WelcomeScreen />
+        )}
+      </div>
     </div>
   )
 }
