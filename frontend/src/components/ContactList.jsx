@@ -4,20 +4,25 @@ import UsersLoadingSkeleton from './UsersLoadingSkeleton';
 import NoChatsFound from './NoChatsFound';
 import {useAuthStore} from '../store/useAuthStore';
 
-function ContactList() {
+function ContactList({ searchQuery = '' }) {
      const { getAllContacts, allContacts, isUserLoading, setSelectedUser } = useChatStore();
       const {onlineUsers} = useAuthStore();
     
      useEffect(() => {
         getAllContacts();
      }, [getAllContacts]);
+
+     const filteredContacts = allContacts.filter(contact => 
+       contact.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+       contact.email.toLowerCase().includes(searchQuery.toLowerCase())
+     );
         
      if(isUserLoading) return <UsersLoadingSkeleton/>
-     if(allContacts.length === 0) return <NoChatsFound/>
+     if(filteredContacts.length === 0) return <NoChatsFound/>
         
   return (
     <>
-    {allContacts.map((contact) => (
+    {filteredContacts.map((contact) => (
         <div
           key={contact._id}
           className="bg-cyan-500/10 p-4 rounded-lg cursor-pointer hover:bg-cyan-500/20 transition-colors"
